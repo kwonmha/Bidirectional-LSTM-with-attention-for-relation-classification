@@ -1,4 +1,4 @@
-# Convolutional Recurrent Neural Networks for Relation Extraction
+# Attention-Based Bidirectional Long Short-Term Memory Networks for Relation Classification
 
 Deep Learning Approach for Relation Extraction Challenge([**SemEval-2010 Task #8**: *Multi-Way Classification of Semantic Relations Between Pairs of Nominals*](https://docs.google.com/document/d/1QO_CnmvNRnYwNWu1-QCAeR5ToQYkXUqFeAJbdEhsq7w/preview)) using Convolutional Recurrent Neural Networks.
 
@@ -8,10 +8,10 @@ Deep Learning Approach for Relation Extraction Challenge([**SemEval-2010 Task #8
 
 ### Experimental results
 
-| Parameters             | Test Data Accuracy  | F1 score             |
-|------------------------|:-------------------:|:--------------------:|
-| CRNN-Max               | 73%                 | 74.28%                |
-| CRNN-Att(not uploaded) |                     |                      |
+| Parameters                      | Test Data Accuracy  | F1 score             |
+|---------------------------------|:-------------------:|:--------------------:|
+| BiLSTMAtt-softmax               | %                   | %                    |
+| BiLSTMAtt-ranking(not uploaded) |                     |                      |
 
 
 ## Usage
@@ -120,4 +120,5 @@ Deep Learning Approach for Relation Extraction Challenge([**SemEval-2010 Task #8
 
 
 ## Reference
-* **Learning local and global contexts using a convolutional recurrent network model for relation classification in biomedical text** (CoNLL 2017), D Raj et al. [[paper]](http://www.aclweb.org/anthology/K17-1032) [[github]](https://github.com/desh2608/crnn-relation-classification)
+* **Attention-Based Bidirectional Long Short-Term Memory Networks for Relation Classification** (ACL 2016), D Raj et al. [[paper]](http://www.aclweb.org/anthology/P16-2034) 
+* **Classifying Relations by Ranking with Convolutional Neural Networks** (ACL 2015), dos Santos et al. [[paper]](https://arxiv.org/pdf/1504.06580v2.pdf)
