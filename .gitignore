@@ -1,0 +1,6 @@
+runs/
+.idea/
+__pycache__/
+SemEval2010_task8_all_data.zip
+GoogleNews-vectors-negative300.bin
+GoogleNews-vectors-negative300.bin.gz
