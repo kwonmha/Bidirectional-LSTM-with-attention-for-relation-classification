@@ -3,7 +3,7 @@
 Deep Learning Approach for Relation Extraction Challenge([**SemEval-2010 Task #8**: *Multi-Way Classification of Semantic Relations Between Pairs of Nominals*](https://docs.google.com/document/d/1QO_CnmvNRnYwNWu1-QCAeR5ToQYkXUqFeAJbdEhsq7w/preview)) using Convolutional Recurrent Neural Networks.
 
 <p align="center">
-	<img width="700" height="400" src="https://user-images.githubusercontent.com/8953934/39967385-05995058-56f5-11e8-8080-73d8098cab6b.JPG">
+	<img width="700" height="400" src="https://user-images.githubusercontent.com/8953934/40840406-82836d42-65e1-11e8-8b70-1592707a3fed.JPG">
 </p>
 
 ### Experimental results
