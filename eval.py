@@ -15,11 +15,11 @@ warnings.filterwarnings("ignore", category=sklearn.exceptions.UndefinedMetricWar
 # Data loading params
 tf.flags.DEFINE_string("eval_dir", "SemEval2010_task8_all_data/SemEval2010_task8_testing_keys/TEST_FILE_FULL.TXT", "Path of evaluation data")
 tf.flags.DEFINE_string("output_dir", "SemEval2010_task8_all_data/SemEval2010_task8_scorer-v1.2/prediction.txt", "Path of prediction for evaluation data")
-tf.flags.DEFINE_string("target_dir", "SemEval2010_task8_all_data/SemEval2010_task8_scorer-v1.2//answer.txt", "Path of target(answer) file for evaluation data")
+tf.flags.DEFINE_string("target_dir", "SemEval2010_task8_all_data/SemEval2010_task8_scorer-v1.2/answer.txt", "Path of target(answer) file for evaluation data")
 
 # Eval Parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (Default: 64)")
-tf.flags.DEFINE_string("checkpoint_dir", "runs/1526734166/checkpoints/", "Checkpoint directory from training run")
+tf.flags.DEFINE_string("checkpoint_dir", "runs/1527593729/checkpoints/", "Checkpoint directory from training run")
 
 # Misc Parameters
 tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
@@ -66,7 +66,8 @@ def eval():
 
 			# Get the placeholders from the graph by name
 			input_text = graph.get_operation_by_name("input_text").outputs[0]
-			dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
+			dropout_keep_prob1 = graph.get_operation_by_name("dropout_keep_prob1").outputs[0]
+			dropout_keep_prob2 = graph.get_operation_by_name("dropout_keep_prob2").outputs[0]
 
 			# Tensors we want to evaluate
 			predictions = graph.get_operation_by_name("predictions").outputs[0]
@@ -79,7 +80,7 @@ def eval():
 			for x_eval_batch in batches:
 				# x_batch = np.array(x_eval_batch).transpose((1, 0, 2))
 				batch_predictions = sess.run(predictions, {input_text: x_eval_batch,
-														   dropout_keep_prob: 1.0})
+														   dropout_keep_prob1: 1.0, dropout_keep_prob2: 1.0})
 				all_predictions = np.concatenate([all_predictions, batch_predictions])
 
 			correct_predictions = float(sum(all_predictions == y_eval))

@@ -18,25 +18,27 @@ warnings.filterwarnings("ignore", category=sklearn.exceptions.UndefinedMetricWar
 tf.flags.DEFINE_string("train_dir", "SemEval2010_task8_all_data/SemEval2010_task8_training/TRAIN_FILE.TXT", "Path of train data")
 tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training data to use for validation")
 tf.flags.DEFINE_integer("max_sentence_length", 100, "Max sentence length in train(98)/test(70) data (Default: 100)")
+tf.flags.DEFINE_string("log_dir", "tensorboard", "Path of tensorboard")
 
 # Model Hyperparameters
-tf.flags.DEFINE_string("word2vec", "", "Word2vec file with pre-trained embeddings")  # ../GoogleNews-vectors-negative300.bin
+tf.flags.DEFINE_string("word2vec", "../GoogleNews-vectors-negative300.bin", "Word2vec file with pre-trained embeddings")  # ../GoogleNews-vectors-negative300.bin
 tf.flags.DEFINE_integer("text_embedding_dim", 300, "Dimensionality of character embedding (Default: 300)")
-tf.flags.DEFINE_string("layers", "200", "Size of rnn output (Default: 200")
-tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (Default: 0.5)")
-tf.flags.DEFINE_float("l2_reg_lambda", 3.0, "L2 regularization lambda (Default: 3.0)")
+tf.flags.DEFINE_string("layers", "700", "Size of rnn output (Default: 500")
+tf.flags.DEFINE_float("dropout_keep_prob1", 0.3, "Dropout keep probability (Default: 0.3)")
+tf.flags.DEFINE_float("dropout_keep_prob2", 0.5, "Dropout keep probability (Default: 0.5)")
+tf.flags.DEFINE_float("l2_reg_lambda", 1e-5, "L2 regularization lambda (Default: 1e-5)")
+tf.flags.DEFINE_boolean("use_ranking_loss", True, "Use ranking loss (Default : False)")
 tf.flags.DEFINE_float("gamma", 2.0, "scaling parameter (Default: 2.0)")
 tf.flags.DEFINE_float("mp", 2.5, "m value for positive class (Default: 2.5)")
 tf.flags.DEFINE_float("mn", 0.5, "m value for negative class (Default: 0.5)")
-tf.flags.DEFINE_boolean("use_ranking_loss", False, "Use ranking loss (Default : False")
 
 # Training parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (Default: 64)")
-tf.flags.DEFINE_integer("num_epochs", 30, "Number of training epochs (Default: 100)")  # 100 epochs - 11290 steps
+tf.flags.DEFINE_integer("num_epochs", 50, "Number of training epochs (Default: 100)")  # 100 epochs - 11290 steps
 tf.flags.DEFINE_integer("display_every", 10, "Number of iterations to display training info.")
 tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps")
 tf.flags.DEFINE_integer("checkpoint_every", 100, "Save model after this many steps")
-tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store")
+tf.flags.DEFINE_integer("num_checkpoints", 10, "Number of checkpoints to store")
 tf.flags.DEFINE_float("learning_rate", 1e-3, "Which learning rate to start with. (Default: 1e-3)")
 
 # Misc Parameters
@@ -88,7 +90,10 @@ def train():
 	with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
 		model = BiLSTMAttention(layers=FLAGS.layers, max_length=FLAGS.max_sentence_length, n_classes=y.shape[1],
 					vocab_size=len(text_vocab_processor.vocabulary_), embedding_size=FLAGS.text_embedding_dim, batch_size=FLAGS.batch_size,
-					gamma=FLAGS.gamma, mp=FLAGS.mp, mn=FLAGS.mn, use_ranking_loss=FLAGS.use_ranking_loss)
+					l2_reg_lambda=FLAGS.l2_reg_lambda, gamma=FLAGS.gamma, mp=FLAGS.mp, mn=FLAGS.mn, use_ranking_loss=FLAGS.use_ranking_loss)
+
+		# writer = tf.summary.FileWriter("C:/Users/Kwon/workspace/Python/relation-extraction/Bidirectional-LSTM-with-attention-for-relation-classification/" + FLAGS.log_dir, sess.graph)
+		# writer.add_graph(sess.graph)
 
 		# Output directory for models and summaries
 		timestamp = str(int(time.time()))
@@ -134,15 +139,17 @@ def train():
 			sess.run(model.W_emb.assign(initW))
 			print("Success to load pre-trained word2vec model!\n")
 
-		batches = data_helpers.batch_iter(list(zip(x_train, y_train)), FLAGS.batch_size, FLAGS.num_epochs)
+		# batches = data_helpers.batch_iter(list(zip(x_train, y_train)), FLAGS.batch_size, FLAGS.num_epochs)
+		batches = data_helpers.batch_iter(list(zip(x_shuffled, y_shuffled)), FLAGS.batch_size, FLAGS.num_epochs)
 
 		for step, batch in enumerate(batches):
 			x_batch, y_batch = zip(*batch)
 
-			feed_dict = {model.input_text: x_batch, model.dropout_keep_prob: FLAGS.dropout_keep_prob, model.labels: y_batch}
+			feed_dict = {model.input_text: x_batch, model.dropout_keep_prob1: FLAGS.dropout_keep_prob1, model.dropout_keep_prob2: FLAGS.dropout_keep_prob2, model.labels: y_batch}
 			# top2i0, cond, output, pos_out, pos_index, neg_out, neg_index, max_index, _, loss, accuracy = \
 			# 	sess.run([model.top2i, model.cond, model.output, model.pos_out, model.pos_index, model.neg_out, model.neg_index, model.max_index, model.train, model.cost, model.accuracy], feed_dict=feed_dict)
-			_, loss, accuracy = sess.run([model.train, model.cost, model.accuracy], feed_dict=feed_dict)
+			_, loss, accuracy = sess.run([ model.train, model.cost, model.accuracy], feed_dict=feed_dict)
+			# writer.add_summary(sum, global_step=step)
 
 			# print(output[:5])
 			# print(np.max(output, axis=1)[:5])
@@ -167,7 +174,8 @@ def train():
 				feed_dict = {
 					model.input_text: x_dev,
 					model.labels: y_dev,
-					model.dropout_keep_prob: 1.0
+					model.dropout_keep_prob1: 1.0,
+					model.dropout_keep_prob2: 1.0
 				}
 				loss, accuracy, predictions = sess.run(
 					[model.cost, model.accuracy, model.predictions], feed_dict)
