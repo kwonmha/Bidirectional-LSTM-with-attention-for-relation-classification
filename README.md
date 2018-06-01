@@ -24,26 +24,51 @@ Deep Learning Approach for Relation Extraction Challenge([**SemEval-2010 Task #8
 
 	```bash
 	optional arguments:
-		-h, --help            show this help message and exit
-		--train_dir TRAIN_DIR
-								Path of train data
-		--dev_sample_percentage DEV_SAMPLE_PERCENTAGE
-								Percentage of the training data to use for validation
-		--max_sentence_length MAX_SENTENCE_LENGTH
-								Max sentence length in train(98)/test(70) data
-								(Default: 100)
-		--dropout_keep_prob DROPOUT_KEEP_PROB
-								Dropout keep probability (Default: 0.5)
-		--batch_size BATCH_SIZE
-								Batch Size (Default: 64)
-		--num_epochs NUM_EPOCHS
-								Number of training epochs (Default: 100)
-		--display_every DISPLAY_EVERY
-								Number of iterations to display training info.
-		--evaluate_every EVALUATE_EVERY
-								Evaluate model on dev set after this many steps
-		--learning_rate LEARNING_RATE
-								Which learning rate to start with. (Default: 1e-3)
+	  -h, --help            show this help message and exit
+  --train_dir TRAIN_DIR
+                        Path of train data
+  --dev_sample_percentage DEV_SAMPLE_PERCENTAGE
+                        Percentage of the training data to use for validation
+  --max_sentence_length MAX_SENTENCE_LENGTH
+                        Max sentence length in train(98)/test(70) data
+                        (Default: 100)
+  --log_dir LOG_DIR     Path of tensorboard
+  --word2vec WORD2VEC   Word2vec file with pre-trained embeddings
+  --text_embedding_dim TEXT_EMBEDDING_DIM
+                        Dimensionality of character embedding (Default: 300)
+  --layers LAYERS       Size of rnn output (Default: 500
+  --dropout_keep_prob1 DROPOUT_KEEP_PROB1
+                        Dropout keep probability for embedding, LSTM
+                        layer(Default: 0.3)
+  --dropout_keep_prob2 DROPOUT_KEEP_PROB2
+                        Dropout keep probability attention layer (Default:
+                        0.5)
+  --l2_reg_lambda L2_REG_LAMBDA
+                        L2 regularization lambda (Default: 1e-5)
+  --use_ranking_loss [USE_RANKING_LOSS]
+                        Use ranking loss (Default : True)
+  --gamma GAMMA         scaling parameter (Default: 2.0)
+  --mp MP               m value for positive class (Default: 2.5)
+  --mn MN               m value for negative class (Default: 0.5)
+  --batch_size BATCH_SIZE
+                        Batch Size (Default: 64)
+  --num_epochs NUM_EPOCHS
+                        Number of training epochs (Default: 100)
+  --display_every DISPLAY_EVERY
+                        Number of iterations to display training info.
+  --evaluate_every EVALUATE_EVERY
+                        Evaluate model on dev set after this many steps
+  --checkpoint_every CHECKPOINT_EVERY
+                        Save model after this many steps
+  --num_checkpoints NUM_CHECKPOINTS
+                        Number of checkpoints to store
+  --learning_rate LEARNING_RATE
+                        Which learning rate to start with. (Default: 1e-3)
+  --allow_soft_placement [ALLOW_SOFT_PLACEMENT]
+                        Allow device soft device placement
+  --noallow_soft_placement
+  --log_device_placement [LOG_DEVICE_PLACEMENT]
+                        Log placement of ops on devices
 	```
 
 * **Train Example:**
