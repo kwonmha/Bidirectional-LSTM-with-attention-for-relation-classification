@@ -23,18 +23,18 @@ tf.flags.DEFINE_string("log_dir", "tensorboard", "Path of tensorboard")
 # Model Hyperparameters
 tf.flags.DEFINE_string("word2vec", "../GoogleNews-vectors-negative300.bin", "Word2vec file with pre-trained embeddings")  # ../GoogleNews-vectors-negative300.bin
 tf.flags.DEFINE_integer("text_embedding_dim", 300, "Dimensionality of character embedding (Default: 300)")
-tf.flags.DEFINE_string("layers", "700", "Size of rnn output (Default: 500")
-tf.flags.DEFINE_float("dropout_keep_prob1", 0.3, "Dropout keep probability (Default: 0.3)")
-tf.flags.DEFINE_float("dropout_keep_prob2", 0.5, "Dropout keep probability (Default: 0.5)")
+tf.flags.DEFINE_string("layers", "1000", "Size of rnn output (Default: 500")
+tf.flags.DEFINE_float("dropout_keep_prob1", 0.3, "Dropout keep probability for embedding, LSTM layer(Default: 0.3)")
+tf.flags.DEFINE_float("dropout_keep_prob2", 0.5, "Dropout keep probability attention layer (Default: 0.5)")
 tf.flags.DEFINE_float("l2_reg_lambda", 1e-5, "L2 regularization lambda (Default: 1e-5)")
-tf.flags.DEFINE_boolean("use_ranking_loss", True, "Use ranking loss (Default : False)")
+tf.flags.DEFINE_boolean("use_ranking_loss", True, "Use ranking loss (Default : True)")
 tf.flags.DEFINE_float("gamma", 2.0, "scaling parameter (Default: 2.0)")
 tf.flags.DEFINE_float("mp", 2.5, "m value for positive class (Default: 2.5)")
 tf.flags.DEFINE_float("mn", 0.5, "m value for negative class (Default: 0.5)")
 
 # Training parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (Default: 64)")
-tf.flags.DEFINE_integer("num_epochs", 50, "Number of training epochs (Default: 100)")  # 100 epochs - 11290 steps
+tf.flags.DEFINE_integer("num_epochs", 100, "Number of training epochs (Default: 100)")  # 100 epochs - 11290 steps
 tf.flags.DEFINE_integer("display_every", 10, "Number of iterations to display training info.")
 tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps")
 tf.flags.DEFINE_integer("checkpoint_every", 100, "Save model after this many steps")
@@ -139,8 +139,10 @@ def train():
 			sess.run(model.W_emb.assign(initW))
 			print("Success to load pre-trained word2vec model!\n")
 
-		# batches = data_helpers.batch_iter(list(zip(x_train, y_train)), FLAGS.batch_size, FLAGS.num_epochs)
-		batches = data_helpers.batch_iter(list(zip(x_shuffled, y_shuffled)), FLAGS.batch_size, FLAGS.num_epochs)
+		batches = data_helpers.batch_iter(list(zip(x_train, y_train)), FLAGS.batch_size, FLAGS.num_epochs)
+		# batches = data_helpers.batch_iter(list(zip(x_shuffled, y_shuffled)), FLAGS.batch_size, FLAGS.num_epochs)
+
+		max_f1 = -1
 
 		for step, batch in enumerate(batches):
 			x_batch, y_batch = zip(*batch)
@@ -150,19 +152,6 @@ def train():
 			# 	sess.run([model.top2i, model.cond, model.output, model.pos_out, model.pos_index, model.neg_out, model.neg_index, model.max_index, model.train, model.cost, model.accuracy], feed_dict=feed_dict)
 			_, loss, accuracy = sess.run([ model.train, model.cost, model.accuracy], feed_dict=feed_dict)
 			# writer.add_summary(sum, global_step=step)
-
-			# print(output[:5])
-			# print(np.max(output, axis=1)[:5])
-			# print(np.argmax(output, axis=1)[:5])
-			# print(pos_out)
-			# print(pos_index)
-			# print(np.argmax(y_batch, axis=1))
-			# print(top2i0)
-			# print(neg_out)
-			# print(cond)
-			# print(neg_index)
-			# print(max_index)
-			# exit()
 
 			# Training log display
 			if step % FLAGS.display_every == 0:
@@ -182,12 +171,13 @@ def train():
 
 				f1 = f1_score(np.argmax(y_dev, axis=1), predictions, average="macro")
 				print("step {}:, loss {}, acc {}, f1 {}\n".format(step, loss, accuracy, f1))
-				print(predictions[:5])
+				# print(predictions[:5])
 
-			# Model checkpoint
-			if step % FLAGS.checkpoint_every == 0:
-				path = saver.save(sess, checkpoint_prefix, global_step=step)
-				print("Saved model checkpoint to {}\n".format(path))
+				# Model checkpoint
+				if f1 > max_f1 * 0.99:
+					path = saver.save(sess, checkpoint_prefix, global_step=step)
+					print("Saved model checkpoint to {}\n".format(path))
+					max_f1 = f1
 
 
 def main(_):
