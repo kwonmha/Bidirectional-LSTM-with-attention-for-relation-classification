@@ -8,10 +8,10 @@ Deep Learning Approach for Relation Extraction Challenge([**SemEval-2010 Task #8
 
 ### Experimental results
 
-| Parameters                      | Test Data Accuracy  | F1 score             |
+| Models                          | Test Data Accuracy  | F1 score             |
 |---------------------------------|:-------------------:|:--------------------:|
-| BiLSTMAtt-softmax               | %                   | %                    |
-| BiLSTMAtt-ranking(not uploaded) |                     |                      |
+| BiLSTMAtt-softmax(dim:1000)     | 71.58%              | 76.43                |
+| BiLSTMAtt-ranking(dim:1000)     | 73.50%              | 77.77                |
 
 
 ## Usage
